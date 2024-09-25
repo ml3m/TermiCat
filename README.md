@@ -1,4 +1,4 @@
 # TermiCat
 cat game in terminal -> work in progress...
 
-<img src=Termi.png>
+<p align="center"><img src=Termi.png/></a></p>
