@@ -1,19 +1,24 @@
 package main
 
 import (
-	"time"
-	"fmt"
 	"os"
-	"golang.org/x/term"
+    "fmt"
+    "time"
 	"strings"
-
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
-	"TermiCat/asciiart"  // Import your asciiart package
+    "golang.org/x/term"
+	"TermiCat/asciiart" // my ascii 
+    "github.com/charmbracelet/lipgloss"
+    tea "github.com/charmbracelet/bubbletea"
 )
 
-func splitLines(content string) []string {
-	return strings.Split(content, "\n")
+func splitLines(content string) []string {return strings.Split(content, "\n")}
+
+type model struct {
+    currentFrame   int       // Track the current animation frame
+    frames         []string  // Store the ASCII frames
+    focusedButton  int       // Track the index of the focused button
+    buttonLabels   []string  // Store button labels
+    actionMessage  string    // Message to display when a button is pressed
 }
 
 func CenterEngine(content string) {
@@ -56,13 +61,6 @@ var (
 	actionMessageStyle = lipgloss.NewStyle().Align(lipgloss.Center).MarginTop(1)
 )
 
-type model struct {
-	currentFrame   int      // Track the current animation frame
-	frames         []string // Store the ASCII frames
-	focusedButton  int      // Track the index of the focused button
-	buttonLabels   []string // Store button labels
-	actionMessage  string    // Message to display when a button is pressed
-}
 
 func (m model) Init() tea.Cmd {
 	// Start the animation loop with a delay
@@ -88,6 +86,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// Set the action message based on the focused button
 			m.actionMessage = fmt.Sprintf("You pressed: %s", m.buttonLabels[m.focusedButton])
             // handling for each button goes here, probably a switch case :p
+            /*
+            // idk yet this part 
+            switch m.buttonLabels[m.focusedButton]*/
 		}
 	case time.Time:
 		// Handle animation frame updates
@@ -102,7 +103,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	// Define the layout using Lipgloss
+	// layout using Lipgloss
 	header := titleStyle.Render("Termicat")
 	coins := coinsStyle.Render("Coins: 100")
 	level := levelStyle.Render("Lv: 5")
@@ -155,5 +156,5 @@ func main() {
 
 	// Create new program object and run
 	p := tea.NewProgram(m)
-	p.Run()
+	p.Run() 
 }
