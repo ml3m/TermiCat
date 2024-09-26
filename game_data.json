@@ -1,0 +1,135 @@
+{
+  "cat": {
+    "wellness": 100,
+    "fullness": 100,
+    "hunger": 100,
+    "dirtiness": 10,
+    "happiness": 70,
+    "energy": 80,
+    "health": 145,
+    "xp": 135,
+    "boredom": 38,
+    "age": 1,
+    "coins": 270,
+    "level": 1,
+    "breed": "Siamese",
+    "name_cat": "Termi",
+    "lastFed": "2024-09-26T04:18:01.032835+03:00",
+    "lastCleaned": "2024-09-26T04:18:01.032835+03:00"
+  },
+  "currentFrame": 0,
+  "frames": [
+    "\n   /\\     /\\  \n  /  \\___/  \\ \n (  o     o  )\n (     ^     )\n  \\_________/ \n   /       \\  \n  /         \\ \n /_/|     |\\_\\\n     ",
+    "\n   /\\     /\\  \n  /  \\___/  \\ \n (  _     _  )\n (     ^     )\n  \\_________/ \n   /       \\  \n  /         \\ \n /_/|     |\\_\\\n     ",
+    "\n \n   /\\     /\\  \n  /  \\___/  \\ \n (  _     _  )\n (     ^     )\n  \\_________/ \n  /         \\ \n /_/|     |\\_\\\n      "
+  ],
+  "focusedButton": -1,
+  "buttonLabels": [
+    "Feed",
+    "Games",
+    "Clean",
+    "Sleep"
+  ],
+  "actionMessage": "You fed the cat: Cheese",
+  "showFoodMenu": false,
+  "showBuyMenu": false,
+  "focusedFoodButton": 0,
+  "foodButtonLabels": [
+    "Feed",
+    "Buy Food"
+  ],
+  "showInventoryMenu": true,
+  "selectedFoodIndex": 8,
+  "foodInventory": [
+    {
+      "name_food": "Apple",
+      "FeedingPower": 10,
+      "cost": 5,
+      "quantity": 3
+    },
+    {
+      "name_food": "Fish",
+      "FeedingPower": 20,
+      "cost": 10,
+      "quantity": 2
+    },
+    {
+      "name_food": "Meat",
+      "FeedingPower": 30,
+      "cost": 15,
+      "quantity": 5
+    },
+    {
+      "name_food": "Milk",
+      "FeedingPower": 5,
+      "cost": 3,
+      "quantity": 0
+    },
+    {
+      "name_food": "Bread",
+      "FeedingPower": 8,
+      "cost": 4,
+      "quantity": 6
+    },
+    {
+      "name_food": "Cheese",
+      "FeedingPower": 12,
+      "cost": 6,
+      "quantity": 3
+    },
+    {
+      "name_food": "Cake",
+      "FeedingPower": 25,
+      "cost": 20,
+      "quantity": 1
+    },
+    {
+      "name_food": "Steak",
+      "FeedingPower": 35,
+      "cost": 25,
+      "quantity": 2
+    },
+    {
+      "name_food": "Carrot",
+      "FeedingPower": 7,
+      "cost": 2,
+      "quantity": 0
+    },
+    {
+      "name_food": "Berry",
+      "FeedingPower": 4,
+      "cost": 1,
+      "quantity": 5
+    },
+    {
+      "name_food": "Nut",
+      "FeedingPower": 3,
+      "cost": 1,
+      "quantity": 0
+    },
+    {
+      "name_food": "Egg",
+      "FeedingPower": 10,
+      "cost": 5,
+      "quantity": 7
+    },
+    {
+      "name_food": "Soup",
+      "FeedingPower": 15,
+      "cost": 12,
+      "quantity": 3
+    },
+    {
+      "name_food": "Pudding",
+      "FeedingPower": 18,
+      "cost": 14,
+      "quantity": 2
+    },
+    {
+      "name_food": "Pie",
+      "FeedingPower": 22,
+      "cost": 18,
+      "quantity": 1
+    }
+  ]
+}
