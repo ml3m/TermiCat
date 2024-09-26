@@ -5,70 +5,15 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 	"time"
-
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+    "strings"
 	"golang.org/x/term"
+    "github.com/charmbracelet/lipgloss"
+    tea "github.com/charmbracelet/bubbletea"
 )
 
 func splitLines(content string) []string {return strings.Split(content, "\n")}
 
-const (
-    XP_FEEDING = 15
-    XP_LEVELUP = 100
-    HUNGER_SATIATED_FACTOR = 20
-    BOREDOM_FEEDING_FACTOR = 2
-    HEALTH_FEEDING_REGEN_FACTOR = 5
-    COINS_FEEDING_FACTOR = 30
-    MAX_FOOD_INVENTORY_QUANTITY = 10
-)
-
-type cat struct {
-    Wellness      int         `json:"wellness"`
-    Fullness      int         `json:"fullness"`
-    Hunger        int         `json:"hunger"`
-    Dirtiness     int         `json:"dirtiness"`
-    Happiness     int         `json:"happiness"`
-    Energy        int         `json:"energy"`
-    Health        int         `json:"health"`
-    Xp            int         `json:"xp"`
-    Boredom       int         `json:"boredom"`
-    Age           int         `json:"age"`
-    Coins         int         `json:"coins"`
-    Level         int         `json:"level"`
-    Breed         string      `json:"breed"`
-    Name          string   `json:"name_cat"`  
-    LastFed       time.Time   `json:"lastFed"`
-    LastCleaned   time.Time   `json:"lastCleaned"`
-}
-
-type food struct {
-    Name         string       `json:"name_food"` 
-    FeedingPower int          `json:"FeedingPower"`
-    Cost         int          `json:"cost"`
-    Quantity     int          `json:"quantity"`
-}
-
-type model struct {
-
-    // Cat attributes
-    MyCat cat   `json:"cat"`
-
-    CurrentFrame   int        `json:"currentFrame"`
-    Frames         []string   `json:"frames"`
-    FocusedButton  int        `json:"focusedButton"`
-    ButtonLabels   []string   `json:"buttonLabels"`
-    ActionMessage  string     `json:"actionMessage"`
-    ShowFoodMenu    bool      `json:"showFoodMenu"`
-    ShowBuyMenu     bool      `json:"showBuyMenu"`
-    FocusedFoodButton int     `json:"focusedFoodButton"`
-    FoodButtonLabels []string `json:"foodButtonLabels"`
-    ShowInventoryMenu bool    `json:"showInventoryMenu"`
-    SelectedFoodIndex int     `json:"selectedFoodIndex"`
-    FoodInventory     []food  `json:"foodInventory"`
-}
 
 func CenterEngine(content string) {
 	// Get terminal size
@@ -377,14 +322,9 @@ func (m model) View() string {
 // Move cursor to the home position and clear the screen
 func clearTerminal() {fmt.Print("\033[H\033[2J") }
 
-/********************************************************************************/
-//                                    main 
-/********************************************************************************/
-func main() {
-    clearTerminal()
-
-    // simple cat blinking animation
+func loadDefaultSettings() model {
 	frames := asciiart.GetFrames()
+
 	m := model{
         // cat init
         MyCat: cat{
@@ -441,12 +381,18 @@ func main() {
         ShowInventoryMenu: false,
         SelectedFoodIndex: 0, // Reset selected food index
 	}
+    
+    return m
+}
 
+/********************************************************************************/
+//                                    main 
+/********************************************************************************/
+func main() {
+    clearTerminal()
 
-    /// SAVING DATA
+    m := loadDefaultSettings()
 
-
-    // Load game data
     loaded_m_data, err := loadGameData("game_data.json")
 
     if err != nil {
@@ -455,7 +401,7 @@ func main() {
 
     m = loaded_m_data
 
-	// Create new program object and run
+    // program 
 	p := tea.NewProgram(m)
 	p.Run() 
 }
