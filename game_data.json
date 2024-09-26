@@ -1,30 +1,30 @@
 {
   "cat": {
     "wellness": 100,
-    "fullness": 95.56492538199996,
+    "fullness": 98.44395804866667,
     "hunger": 100,
-    "dirtiness": 10,
+    "dirtiness": 0,
     "happiness": 100,
     "energy": 140,
-    "health": 725,
-    "xp": 435,
-    "boredom": 246,
+    "health": 770,
+    "xp": 570,
+    "boredom": 264,
     "age": 1,
-    "coins": 2774,
+    "coins": 3044,
     "level": 7,
     "breed": "Siamese",
     "name_cat": "Termi",
-    "lastFed": "2024-09-26T23:07:18.844994+03:00",
+    "lastFed": "2024-09-26T23:59:53.405334+03:00",
     "lastCleaned": "2024-09-26T04:18:01.032835+03:00"
   },
-  "currentFrame": 2,
+  "currentFrame": 1,
   "focusedButton": -1,
-  "focusedFoodButton": 1,
+  "focusedFoodButton": 0,
   "selectedFoodIndex": 1,
   "showFoodMenu": false,
-  "showBuyMenu": true,
-  "showInventoryMenu": false,
-  "actionMessage": "Already stocked up!",
+  "showBuyMenu": false,
+  "showInventoryMenu": true,
+  "actionMessage": "You fed the cat: Fish",
   "frames": [
     "\n   /\\     /\\  \n  /  \\___/  \\ \n (  o     o  )\n (     ^     )\n  \\_________/ \n   /       \\  \n  /         \\ \n /_/|     |\\_\\\n     ",
     "\n   /\\     /\\  \n  /  \\___/  \\ \n (  _     _  )\n (     ^     )\n  \\_________/ \n   /       \\  \n  /         \\ \n /_/|     |\\_\\\n     ",
@@ -44,13 +44,13 @@
     {
       "FeedingPower": 10,
       "cost": 5,
-      "quantity": 1,
+      "quantity": 0,
       "name_food": "Apple"
     },
     {
       "FeedingPower": 20,
       "cost": 10,
-      "quantity": 10,
+      "quantity": 2,
       "name_food": "Fish"
     },
     {
@@ -133,5 +133,6 @@
     }
   ],
   "isLevelUpAnimating": false,
-  "LevelUpStartTime": "2024-09-26T22:49:08.28767+03:00"
+  "LevelUpStartTime": "2024-09-26T22:49:08.28767+03:00",
+  "showCleanMenu": false
 }

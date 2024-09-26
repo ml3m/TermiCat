@@ -1,13 +1,11 @@
 package main
 
 import (
-	"TermiCat/asciiart" // my ascii
+	"TermiCat/asciiart"
 	"fmt"
 	"log"
-	//"os"
 	"time"
     "strings"
-	//"golang.org/x/term"
     "github.com/charmbracelet/lipgloss"
     tea "github.com/charmbracelet/bubbletea"
 )
@@ -20,79 +18,7 @@ func (m model) Init() tea.Cmd {
 	})
 }
 
-func (c *cat) GainXP(amount int, m *model) {
-    c.Xp += amount
-    if c.Xp >= c.XPThreshold() {
-        c.LevelUp(m)
-    }
-}
-
-func (c *cat) LevelUp(m *model) {
-    c.Level++
-    c.Xp = 0 
-    c.Health += 10 
-    c.Happiness += 5 
-    c.Energy += 10
-    c.Coins += 100
-
-    m.IsLevelUpAnimating = true
-    m.Frames = asciiart.GetLevelUpFrames()
-    m.LevelUpStartTime = time.Now()
-    
-}
-
-func (c *cat) XPThreshold() int {
-    return 100 * c.Level 
-    // level up hardness grows by 100 each time. 
-}
-
-
-func (m *model) handleCatState() {
-    if m.MyCat.Health <= 0 {
-        // death
-        m.Frames = asciiart.GetDeadCat() // Load the death frames if the cat is dead
-    }
-    
-    if m.MyCat.Hunger > 100 {
-        m.MyCat.Hunger = 100 // Cap hunger at 100
-    }
-    
-    if m.MyCat.Fullness > 100 {
-        m.MyCat.Fullness = 100 // Cap fullness at 100
-    }
-    
-    if m.MyCat.Wellness < 60 {
-        m.MyCat.Happiness -= 10 // Decrease happiness
-        if m.MyCat.Happiness < 0 {
-            m.MyCat.Happiness = 0 // Ensure happiness doesn't go below 0
-        }
-    }
-    
-    if m.MyCat.Dirtiness > 80 {
-        m.MyCat.Wellness -= 5 // Decrease wellness
-        if m.MyCat.Wellness < 0 {
-            m.MyCat.Wellness = 0 // Ensure wellness doesn't go below 0
-        }
-    }
-
-    if m.MyCat.Energy < 50 {
-        m.MyCat.Happiness -= 5 // Decrease happiness
-        if m.MyCat.Happiness < 0 {
-            m.MyCat.Happiness = 0 // Ensure happiness doesn't go below 0
-        }
-    }
-
-    if m.MyCat.Age > 15 {
-        m.MyCat.Health -= 10 // Decrease health due to age
-        if m.MyCat.Health < 0 {
-            m.MyCat.Health = 0 // Ensure health doesn't go below 0
-        }
-    }
-}
-
-
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-
 
     // Handle level-up animation timing
     if m.IsLevelUpAnimating {
@@ -120,11 +46,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     // Smoothly decrease fullness by a proportional amount
     m.MyCat.Fullness -= FULLNESS_DECAY_RATE_PER_SECOND * seconds
 
-    // Ensure fullness does not drop below 0
-    if m.MyCat.Fullness < 0 {
-        m.MyCat.Fullness = 0
-    }
-
     // Reset the last update time
     m.MyCat.LastFed = currentTime
 
@@ -141,6 +62,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
             return m, tea.Quit
         }
+
+
+        if m.ShowCleanMenu {
+            switch msg.String() {
+            case "enter":
+                // Perform clean action
+                m.MyCat.Dirtiness = 0 // Reset dirtiness
+                m.ActionMessage = "Your cat has been cleaned!"
+                m.ShowCleanMenu = false // Hide the clean menu after action
+            case "esc":
+                m.ShowCleanMenu = false // Hide the clean menu
+            }
+            return m, nil // Early return to avoid further processing
+        }
+
 
         // If the buy menu is open
         if m.ShowBuyMenu {
@@ -242,9 +178,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
         case "right":
             m.FocusedButton = (m.FocusedButton + 1) % len(m.ButtonLabels) // Navigate right
         case "enter":
-            if m.FocusedButton == 0 { // "Feed" button
+            if m.FocusedButton == 0 { // "Feed" MAIN button
                 m.ShowFoodMenu = true // Show food menu
                 m.FocusedFoodButton = 0 // Reset food button focus when entering
+                m.FocusedButton = -1 // Reset focused button
+            } else if m.FocusedButton == 2 { // "Clean" MAIN button
+                m.ShowCleanMenu = true // show clean menu
                 m.FocusedButton = -1 // Reset focused button
             }
         }
@@ -346,6 +285,10 @@ func (m model) View() string {
         }
     }
 
+    if m.ShowCleanMenu {
+        print("showcleanmenu View() reached ")
+    }
+
     // Display cat attributes for debugging purposes
     catAttributes := fmt.Sprintf(
         "Xp: %d\nCoins: %d\nName: %s\nBreed: %s\nAge: %d days\nWellness: %d\nFullness: %.0f\nHunger: %d\nDirtiness: %d\nHappiness: %d\nEnergy: %d\nHealth: %d\nBoredom: %d\nLast Fed: %s\nLast Cleaned: %s\n",
@@ -441,6 +384,9 @@ func loadDefaultSettings() model {
 
         // ANIMATION
         IsLevelUpAnimating: false,
+
+        // <> Cleaning <>
+        ShowCleanMenu: false,
 	}
     
     return m

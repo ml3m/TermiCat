@@ -75,4 +75,6 @@ type model struct {
     //level
     IsLevelUpAnimating    bool         `json:"isLevelUpAnimating"`
     LevelUpStartTime      time.Time
+
+    ShowCleanMenu         bool         `json:"showCleanMenu"`
 }
