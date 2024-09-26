@@ -24,6 +24,7 @@ func (c *cat) LevelUp(m *model) {
     m.IsLevelUpAnimating = true
     m.Frames = asciiart.GetLevelUpFrames()
     m.LevelUpStartTime = time.Now()
+    m.IgnoreInputDuringAnimation = true // Disable input during animation
     
 }
 
