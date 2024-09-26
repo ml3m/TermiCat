@@ -12,19 +12,6 @@ import (
     tea "github.com/charmbracelet/bubbletea"
 )
 
-// Define styles using Lipgloss
-var (
-	titleStyle        = lipgloss.NewStyle().Bold(true).Align(lipgloss.Center).MarginBottom(1)
-	coinsStyle        = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Padding(0, 1).Align(lipgloss.Center)
-	levelStyle        = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Padding(0, 1).Align(lipgloss.Center)
-	catStyle          = lipgloss.NewStyle().Border(lipgloss.ThickBorder()).Align(lipgloss.Center).Height(8).Width(18)
-	actionsStyle      = lipgloss.NewStyle().Align(lipgloss.Center).MarginTop(1)
-	buttonStyle       = lipgloss.NewStyle().Padding(0, 2).Border(lipgloss.NormalBorder()).Align(lipgloss.Center)
-	focusedButtonStyle = lipgloss.NewStyle().Padding(0, 2).Border(lipgloss.DoubleBorder()).Align(lipgloss.Center)
-	centerStyle       = lipgloss.NewStyle().Align(lipgloss.Center).MarginBottom(2)
-	actionMessageStyle = lipgloss.NewStyle().Align(lipgloss.Center).MarginTop(1)
-)
-
 
 func (m model) Init() tea.Cmd {
 	// Start the animation loop with a delay
@@ -33,30 +20,36 @@ func (m model) Init() tea.Cmd {
 	})
 }
 
-func (c *cat) GainXP(amount int) {
+func (c *cat) GainXP(amount int, m *model) {
     c.Xp += amount
     if c.Xp >= c.XPThreshold() {
-        c.LevelUp()
+        c.LevelUp(m)
     }
 }
 
-func (c *cat) LevelUp() {
+func (c *cat) LevelUp(m *model) {
     c.Level++
     c.Xp = 0 
     c.Health += 10 
     c.Happiness += 5 
     c.Energy += 10
     c.Coins += 100
-    // Unlock features, show messages, etc.
+
+    m.IsLevelUpAnimating = true
+    m.Frames = asciiart.GetLevelUpFrames()
+    m.LevelUpStartTime = time.Now()
+    
 }
 
 func (c *cat) XPThreshold() int {
-    return 100 * c.Level // Example threshold formula
+    return 100 * c.Level 
+    // level up hardness grows by 100 each time. 
 }
 
 
 func (m *model) handleCatState() {
     if m.MyCat.Health <= 0 {
+        // death
         m.Frames = asciiart.GetDeadCat() // Load the death frames if the cat is dead
     }
     
@@ -100,9 +93,25 @@ func (m *model) handleCatState() {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
+
+    // Handle level-up animation timing
+    if m.IsLevelUpAnimating {
+        if time.Since(m.LevelUpStartTime) >= 3*time.Second {
+            // End the animation after 3 seconds
+            m.Frames = asciiart.GetFrames() // Return to normal frames
+            m.IsLevelUpAnimating = false    // End level-up animation
+        }
+        // Continue the animation loop even during the level-up animation
+        m.CurrentFrame = (m.CurrentFrame + 1) % len(m.Frames)
+        return m, tea.Tick(time.Millisecond*500, func(t time.Time) tea.Msg {
+            return t
+        })
+    }
+
     m.handleCatState()
 
     currentTime := time.Now()
+
     elapsed := currentTime.Sub(m.MyCat.LastFed)
 
     // Convert elapsed time to seconds
@@ -122,9 +131,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
     switch msg := msg.(type) {
     case tea.KeyMsg:
-        // Handle quit (q or ctrl+c)
-        if msg.String() == "q" || msg.String() == "ctrl+c" {
 
+        if msg.String() == "q" || msg.String() == "ctrl+c" {
             /// SAVING THIS EVIL JSON
             err := SaveGameData(m, "game_data.json")
             if err != nil {
@@ -201,13 +209,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
             case "enter":
                 selectedFood := &m.FoodInventory[m.SelectedFoodIndex]
                 if selectedFood.Quantity > 0 && m.MyCat.Fullness < 100 {
-                    // Feed the cat
-                    m.MyCat.GainXP(XP_FEEDING)
+                    // Feed food to cat
+                    selectedFood.Quantity-- 
 
-                    m.MyCat.Fullness += float64(selectedFood.FeedingPower)
-                    selectedFood.Quantity-- // Decrease the quantity of the food
-                    m.MyCat.Hunger += HUNGER_SATIATED_FACTOR
                     m.ActionMessage = fmt.Sprintf("You fed the cat: %s", selectedFood.Name)
+
+                    m.MyCat.GainXP(XP_FEEDING, &m)
+                    m.MyCat.Fullness += float64(selectedFood.FeedingPower)
+                    m.MyCat.Hunger += HUNGER_SATIATED_FACTOR
                     m.MyCat.Boredom += BOREDOM_FEEDING_FACTOR
                     m.MyCat.Health += HEALTH_FEEDING_REGEN_FACTOR
                     m.MyCat.Coins += COINS_FEEDING_FACTOR 
@@ -255,7 +264,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
     // layout using Lipgloss
     header := titleStyle.Render("Termicat")
-    coins := coinsStyle.Render("Coins: 100")
+    
+    // fix coins display in this render !!!
+    coins := coinsStyle.Render(fmt.Sprintf("Coins: %d", m.MyCat.Coins))
     level := levelStyle.Render(fmt.Sprintf("Lv: %d", m.MyCat.Level))
 
     // Check if frames are loaded before accessing them
@@ -427,6 +438,9 @@ func loadDefaultSettings() model {
 
         ShowInventoryMenu: false,
         SelectedFoodIndex: 0, // Reset selected food index
+
+        // ANIMATION
+        IsLevelUpAnimating: false,
 	}
     
     return m
@@ -448,6 +462,7 @@ func main() {
 
     m = loaded_m_data
 
+    m.Frames = asciiart.GetFrames()
     // program 
 	p := tea.NewProgram(m)
 	p.Run() 

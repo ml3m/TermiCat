@@ -1,30 +1,30 @@
 {
   "cat": {
     "wellness": 100,
-    "fullness": 94.21319404850003,
+    "fullness": 95.56492538199996,
     "hunger": 100,
     "dirtiness": 10,
-    "happiness": 85,
-    "energy": 110,
-    "health": 350,
-    "xp": 0,
-    "boredom": 108,
+    "happiness": 100,
+    "energy": 140,
+    "health": 725,
+    "xp": 435,
+    "boredom": 246,
     "age": 1,
-    "coins": 1516,
-    "level": 4,
+    "coins": 2774,
+    "level": 7,
     "breed": "Siamese",
     "name_cat": "Termi",
-    "lastFed": "2024-09-26T05:04:50.133471+03:00",
+    "lastFed": "2024-09-26T23:07:18.844994+03:00",
     "lastCleaned": "2024-09-26T04:18:01.032835+03:00"
   },
-  "currentFrame": 1,
+  "currentFrame": 2,
   "focusedButton": -1,
-  "focusedFoodButton": 0,
+  "focusedFoodButton": 1,
   "selectedFoodIndex": 1,
   "showFoodMenu": false,
-  "showBuyMenu": false,
-  "showInventoryMenu": true,
-  "actionMessage": "You fed the cat: Fish",
+  "showBuyMenu": true,
+  "showInventoryMenu": false,
+  "actionMessage": "Already stocked up!",
   "frames": [
     "\n   /\\     /\\  \n  /  \\___/  \\ \n (  o     o  )\n (     ^     )\n  \\_________/ \n   /       \\  \n  /         \\ \n /_/|     |\\_\\\n     ",
     "\n   /\\     /\\  \n  /  \\___/  \\ \n (  _     _  )\n (     ^     )\n  \\_________/ \n   /       \\  \n  /         \\ \n /_/|     |\\_\\\n     ",
@@ -50,13 +50,13 @@
     {
       "FeedingPower": 20,
       "cost": 10,
-      "quantity": 1,
+      "quantity": 10,
       "name_food": "Fish"
     },
     {
       "FeedingPower": 30,
       "cost": 15,
-      "quantity": 4,
+      "quantity": 0,
       "name_food": "Meat"
     },
     {
@@ -74,19 +74,19 @@
     {
       "FeedingPower": 12,
       "cost": 6,
-      "quantity": 7,
+      "quantity": 0,
       "name_food": "Cheese"
     },
     {
       "FeedingPower": 25,
       "cost": 20,
-      "quantity": 0,
+      "quantity": 10,
       "name_food": "Cake"
     },
     {
       "FeedingPower": 35,
       "cost": 25,
-      "quantity": 0,
+      "quantity": 2,
       "name_food": "Steak"
     },
     {
@@ -104,25 +104,25 @@
     {
       "FeedingPower": 3,
       "cost": 1,
-      "quantity": 10,
+      "quantity": 6,
       "name_food": "Nut"
     },
     {
       "FeedingPower": 10,
       "cost": 5,
-      "quantity": 1,
+      "quantity": 10,
       "name_food": "Egg"
     },
     {
       "FeedingPower": 15,
       "cost": 12,
-      "quantity": 1,
+      "quantity": 10,
       "name_food": "Soup"
     },
     {
       "FeedingPower": 18,
       "cost": 14,
-      "quantity": 1,
+      "quantity": 10,
       "name_food": "Pudding"
     },
     {
@@ -131,5 +131,7 @@
       "quantity": 0,
       "name_food": "Pie"
     }
-  ]
+  ],
+  "isLevelUpAnimating": false,
+  "LevelUpStartTime": "2024-09-26T22:49:08.28767+03:00"
 }

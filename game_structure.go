@@ -1,5 +1,22 @@
 package main
-import ("time")
+import (
+    "time"
+    "github.com/charmbracelet/lipgloss"
+)
+
+
+// Define styles using Lipgloss
+var (
+	titleStyle        = lipgloss.NewStyle().Bold(true).Align(lipgloss.Center).MarginBottom(1)
+	coinsStyle        = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Padding(0, 1).Align(lipgloss.Center)
+	levelStyle        = lipgloss.NewStyle().Border(lipgloss.RoundedBorder()).Padding(0, 1).Align(lipgloss.Center)
+	catStyle          = lipgloss.NewStyle().Border(lipgloss.ThickBorder()).Align(lipgloss.Center).Height(8).Width(18)
+	actionsStyle      = lipgloss.NewStyle().Align(lipgloss.Center).MarginTop(1)
+	buttonStyle       = lipgloss.NewStyle().Padding(0, 2).Border(lipgloss.NormalBorder()).Align(lipgloss.Center)
+	focusedButtonStyle = lipgloss.NewStyle().Padding(0, 2).Border(lipgloss.DoubleBorder()).Align(lipgloss.Center)
+	centerStyle       = lipgloss.NewStyle().Align(lipgloss.Center).MarginBottom(2)
+	actionMessageStyle = lipgloss.NewStyle().Align(lipgloss.Center).MarginTop(1)
+)
 
 const (
     // Core game settings.
@@ -54,4 +71,8 @@ type model struct {
     ButtonLabels        []string       `json:"buttonLabels"`
     FoodButtonLabels    []string       `json:"foodButtonLabels"`
     FoodInventory       []food         `json:"foodInventory"`
+
+    //level
+    IsLevelUpAnimating    bool         `json:"isLevelUpAnimating"`
+    LevelUpStartTime      time.Time
 }
