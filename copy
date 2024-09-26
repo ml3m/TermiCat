@@ -1,0 +1,58 @@
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+    // Handle level-up animation timing
+    if m.IsLevelUpAnimating {
+        if time.Since(m.LevelUpStartTime) >= 3*time.Second {
+            // End the animation after 3 seconds
+            m.Frames = asciiart.GetFrames() // Return to normal frames
+            m.IsLevelUpAnimating = false    // End level-up animation
+        }
+        // Continue the animation loop even during the level-up animation
+        m.CurrentFrame = (m.CurrentFrame + 1) % len(m.Frames)
+        return m, tea.Tick(time.Millisecond*500, func(t time.Time) tea.Msg {
+            return t
+        })
+    }
+
+    m.handleCatState()
+
+    currentTime := time.Now()
+
+    elapsed := currentTime.Sub(m.MyCat.LastFed)
+
+    // Convert elapsed time to seconds
+    seconds := elapsed.Seconds()
+
+    // Smoothly decrease fullness by a proportional amount
+    m.MyCat.Fullness -= FULLNESS_DECAY_RATE_PER_SECOND * seconds
+
+    // Reset the last update time
+    m.MyCat.LastFed = currentTime
+
+
+    switch msg := msg.(type) {
+    case tea.KeyMsg:
+
+        if msg.String() == "q" || msg.String() == "ctrl+c" {
+            /// SAVING THIS EVIL JSON
+            err := SaveGameData(m, "game_data.json")
+            if err != nil {
+                log.Fatalf("Error saving game data: %v", err)
+            }
+
+            return m, tea.Quit
+        }
+
+        // all cases here 
+
+    case time.Time:
+        // Handle animation frame updates
+        m.CurrentFrame = (m.CurrentFrame + 1) % len(m.Frames)
+        // Continue the animation loop
+        return m, tea.Tick(time.Millisecond*500, func(t time.Time) tea.Msg {
+            return t
+        })
+    }
+
+    return m, nil
+}

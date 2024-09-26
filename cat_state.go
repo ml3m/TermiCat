@@ -5,7 +5,6 @@ import (
     "time"
 )
 
-
 func (m *model) handleCatState() {
     if m.MyCat.Health <= 0 {
         // death
