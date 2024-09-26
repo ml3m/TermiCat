@@ -4,43 +4,13 @@ import (
 	"TermiCat/asciiart" // my ascii
 	"fmt"
 	"log"
-	"os"
+	//"os"
 	"time"
     "strings"
-	"golang.org/x/term"
+	//"golang.org/x/term"
     "github.com/charmbracelet/lipgloss"
     tea "github.com/charmbracelet/bubbletea"
 )
-
-func splitLines(content string) []string {return strings.Split(content, "\n")}
-
-
-func CenterEngine(content string) {
-	// Get terminal size
-	width, height, _ := term.GetSize(int(os.Stdout.Fd())) // _ is err ignored for now 
-
-	// Split the content into lines
-	lines := splitLines(content)
-	contentHeight := len(lines)
-
-	// Find the maximum width of the content
-	maxWidth := 0
-	for _, line := range lines {
-		if len(line) > maxWidth {
-			maxWidth = len(line)
-		}
-	}
-
-	// Calculate center position
-	x := (width - maxWidth) / 2
-	y := (height - contentHeight) / 2
-
-	// Print each line at the center position
-	for i, line := range lines {
-		fmt.Printf("\033[%d;%dH%s", y+i+1, x+1, line) // Add 1 because terminal positions are 1-based
-	}
-	fmt.Println("\033[0m") // Reset terminal color
-}
 
 // Define styles using Lipgloss
 var (
@@ -63,11 +33,92 @@ func (m model) Init() tea.Cmd {
 	})
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-    // Handle all possible outcomes of the poor cat
+func (c *cat) GainXP(amount int) {
+    c.Xp += amount
+    if c.Xp >= c.XPThreshold() {
+        c.LevelUp()
+    }
+}
+
+func (c *cat) LevelUp() {
+    c.Level++
+    c.Xp = 0 
+    c.Health += 10 
+    c.Happiness += 5 
+    c.Energy += 10
+    c.Coins += 100
+    // Unlock features, show messages, etc.
+}
+
+func (c *cat) XPThreshold() int {
+    return 100 * c.Level // Example threshold formula
+}
+
+
+func (m *model) handleCatState() {
     if m.MyCat.Health <= 0 {
         m.Frames = asciiart.GetDeadCat() // Load the death frames if the cat is dead
     }
+    
+    if m.MyCat.Hunger > 100 {
+        m.MyCat.Hunger = 100 // Cap hunger at 100
+    }
+    
+    if m.MyCat.Fullness > 100 {
+        m.MyCat.Fullness = 100 // Cap fullness at 100
+    }
+    
+    if m.MyCat.Wellness < 60 {
+        m.MyCat.Happiness -= 10 // Decrease happiness
+        if m.MyCat.Happiness < 0 {
+            m.MyCat.Happiness = 0 // Ensure happiness doesn't go below 0
+        }
+    }
+    
+    if m.MyCat.Dirtiness > 80 {
+        m.MyCat.Wellness -= 5 // Decrease wellness
+        if m.MyCat.Wellness < 0 {
+            m.MyCat.Wellness = 0 // Ensure wellness doesn't go below 0
+        }
+    }
+
+    if m.MyCat.Energy < 50 {
+        m.MyCat.Happiness -= 5 // Decrease happiness
+        if m.MyCat.Happiness < 0 {
+            m.MyCat.Happiness = 0 // Ensure happiness doesn't go below 0
+        }
+    }
+
+    if m.MyCat.Age > 15 {
+        m.MyCat.Health -= 10 // Decrease health due to age
+        if m.MyCat.Health < 0 {
+            m.MyCat.Health = 0 // Ensure health doesn't go below 0
+        }
+    }
+}
+
+
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+
+    m.handleCatState()
+
+    currentTime := time.Now()
+    elapsed := currentTime.Sub(m.MyCat.LastFed)
+
+    // Convert elapsed time to seconds
+    seconds := elapsed.Seconds()
+
+    // Smoothly decrease fullness by a proportional amount
+    m.MyCat.Fullness -= FULLNESS_DECAY_RATE_PER_SECOND * seconds
+
+    // Ensure fullness does not drop below 0
+    if m.MyCat.Fullness < 0 {
+        m.MyCat.Fullness = 0
+    }
+
+    // Reset the last update time
+    m.MyCat.LastFed = currentTime
+
 
     switch msg := msg.(type) {
     case tea.KeyMsg:
@@ -151,22 +202,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
                 selectedFood := &m.FoodInventory[m.SelectedFoodIndex]
                 if selectedFood.Quantity > 0 && m.MyCat.Fullness < 100 {
                     // Feed the cat
-                    m.MyCat.Xp += XP_FEEDING // XP rewarded for feeding
-                    m.MyCat.Fullness += selectedFood.FeedingPower
+                    m.MyCat.GainXP(XP_FEEDING)
+
+                    m.MyCat.Fullness += float64(selectedFood.FeedingPower)
                     selectedFood.Quantity-- // Decrease the quantity of the food
                     m.MyCat.Hunger += HUNGER_SATIATED_FACTOR
                     m.ActionMessage = fmt.Sprintf("You fed the cat: %s", selectedFood.Name)
                     m.MyCat.Boredom += BOREDOM_FEEDING_FACTOR
                     m.MyCat.Health += HEALTH_FEEDING_REGEN_FACTOR
                     m.MyCat.Coins += COINS_FEEDING_FACTOR 
+                    m.MyCat.LastFed = time.Now()
 
                     // Cap hunger and fullness at 100
-                    if m.MyCat.Hunger > 100 {
-                        m.MyCat.Hunger = 100
-                    }
-                    if m.MyCat.Fullness > 100 {
-                        m.MyCat.Fullness = 100
-                    }
                 } else if selectedFood.Quantity <= 0 {
                     m.ActionMessage = "Out of stock!"
                 } else if m.MyCat.Fullness >= 100 {
@@ -290,7 +337,7 @@ func (m model) View() string {
 
     // Display cat attributes for debugging purposes
     catAttributes := fmt.Sprintf(
-        "Xp: %d\nCoins: %d\nName: %s\nBreed: %s\nAge: %d days\nWellness: %d\nFullness: %d\nHunger: %d\nDirtiness: %d\nHappiness: %d\nEnergy: %d\nHealth: %d\nBoredom: %d\nLast Fed: %s\nLast Cleaned: %s\n",
+        "Xp: %d\nCoins: %d\nName: %s\nBreed: %s\nAge: %d days\nWellness: %d\nFullness: %.0f\nHunger: %d\nDirtiness: %d\nHappiness: %d\nEnergy: %d\nHealth: %d\nBoredom: %d\nLast Fed: %s\nLast Cleaned: %s\n",
         
         m.MyCat.Xp, m.MyCat.Coins, m.MyCat.Name, m.MyCat.Breed, m.MyCat.Age, m.MyCat.Wellness, m.MyCat.Fullness, m.MyCat.Hunger,
         m.MyCat.Dirtiness, m.MyCat.Happiness, m.MyCat.Energy, m.MyCat.Health, m.MyCat.Boredom,

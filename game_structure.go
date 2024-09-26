@@ -10,11 +10,12 @@ const (
     HEALTH_FEEDING_REGEN_FACTOR = 5
     COINS_FEEDING_FACTOR = 30
     MAX_FOOD_INVENTORY_QUANTITY = 10
+    FULLNESS_DECAY_RATE_PER_SECOND = 100.0 / 600.0
 )
 
 type cat struct {
     Wellness      int         `json:"wellness"`
-    Fullness      int         `json:"fullness"`
+    Fullness      float64     `json:"fullness"`
     Hunger        int         `json:"hunger"`
     Dirtiness     int         `json:"dirtiness"`
     Happiness     int         `json:"happiness"`
