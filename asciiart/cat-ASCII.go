@@ -128,3 +128,19 @@ func GetLevelUpFrames() []string {
         `,
     }
 }
+
+func GetFullnessFrames() []string {
+    return []string {
+        `
+   !      !   
+       !     !
+ <>=========<>
+ | Termi is  |
+ |   Full!   |
+ <>=========<>
+     !   !    
+  !   !    !  
+        `,
+
+    }
+}
