@@ -144,7 +144,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
                 m.SelectedFoodIndex = (m.SelectedFoodIndex + 5) % len(m.FoodInventory) // Move down a row
             case "enter":
                 selectedFood := &m.FoodInventory[m.SelectedFoodIndex]
-                if selectedFood.Quantity > 0 && m.MyCat.Fullness < 100 {
+                if selectedFood.Quantity > 0 && m.MyCat.Fullness <= 99 {
                     // Feed food to cat
                     selectedFood.Quantity-- 
 
