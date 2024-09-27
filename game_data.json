@@ -1,30 +1,30 @@
 {
   "cat": {
     "wellness": 100,
-    "fullness": 99.61760829866667,
+    "fullness": 77.54945950749996,
     "hunger": 100,
     "dirtiness": 0,
     "happiness": 175,
     "energy": 290,
-    "health": 2205,
-    "xp": 195,
-    "boredom": 778,
+    "health": 2285,
+    "xp": 435,
+    "boredom": 810,
     "age": 1,
-    "coins": 9786,
+    "coins": 9526,
     "level": 7,
     "breed": "Siamese",
     "name_cat": "Termi",
-    "lastFed": "2024-09-27T13:05:31.549298+03:00",
+    "lastFed": "2024-09-27T13:59:18.712976+03:00",
     "lastCleaned": "2024-09-26T04:18:01.032835+03:00"
   },
-  "currentFrame": 1,
+  "currentFrame": 0,
   "focusedButton": -1,
-  "focusedFoodButton": 0,
-  "selectedFoodIndex": 7,
+  "focusedFoodButton": 1,
+  "selectedFoodIndex": 0,
   "showFoodMenu": false,
-  "showBuyMenu": false,
-  "showInventoryMenu": true,
-  "actionMessage": "Out of stock!",
+  "showBuyMenu": true,
+  "showInventoryMenu": false,
+  "actionMessage": "Opening buy food menu...",
   "frames": [
     "\n   /\\     /\\  \n  /  \\___/  \\ \n (  o     o  )\n (     ^     )\n  \\_________/ \n   /       \\  \n  /         \\ \n /_/|     |\\_\\\n     ",
     "\n   /\\     /\\  \n  /  \\___/  \\ \n (  _     _  )\n (     ^     )\n  \\_________/ \n   /       \\  \n  /         \\ \n /_/|     |\\_\\\n     ",
@@ -44,7 +44,7 @@
     {
       "FeedingPower": 10,
       "cost": 5,
-      "quantity": 0,
+      "quantity": 10,
       "name_food": "Apple"
     },
     {
@@ -56,7 +56,7 @@
     {
       "FeedingPower": 30,
       "cost": 15,
-      "quantity": 0,
+      "quantity": 10,
       "name_food": "Meat"
     },
     {
@@ -86,7 +86,7 @@
     {
       "FeedingPower": 35,
       "cost": 25,
-      "quantity": 0,
+      "quantity": 10,
       "name_food": "Steak"
     },
     {
@@ -116,7 +116,7 @@
     {
       "FeedingPower": 15,
       "cost": 12,
-      "quantity": 0,
+      "quantity": 10,
       "name_food": "Soup"
     },
     {

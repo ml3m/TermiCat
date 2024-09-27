@@ -5,6 +5,16 @@ import (
     "time"
 )
 
+// decayCatFullness reduces the cat's fullness based on elapsed time.
+func (m *model) decayCatFullness() {
+    currentTime := time.Now()
+    elapsed := currentTime.Sub(m.MyCat.LastFed)
+    seconds := elapsed.Seconds()
+    m.MyCat.Fullness -= FULLNESS_DECAY_RATE_PER_SECOND * seconds
+    m.MyCat.LastFed = currentTime
+}
+
+
 func (m *model) handleCatState() {
     if m.MyCat.Health <= 0 {
         // death

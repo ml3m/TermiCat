@@ -20,16 +20,7 @@ func (m model) Init() tea.Cmd {
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
     if m.IsLevelUpAnimating {
-        if time.Since(m.LevelUpStartTime) >= 3*time.Second {
-            // End the animation after 3 seconds
-            m.Frames = asciiart.GetFrames() // Return to normal frames
-            m.IsLevelUpAnimating = false    // End level-up animation
-        }
-        // Continue the animation loop even during the level-up animation
-        m.CurrentFrame = (m.CurrentFrame + 1) % len(m.Frames)
-        return m, tea.Tick(time.Millisecond*500, func(t time.Time) tea.Msg {
-            return t
-        })
+        return m.handleLevelUpAnimation()
     }
 
     m.handleCatState()
@@ -42,133 +33,33 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
         }
 
         if m.ShowCleanMenu {
-            switch msg.String() {
-            case "enter":
-                // Perform clean action
-                m.MyCat.Dirtiness = 0 // Reset dirtiness
-                m.ActionMessage = "Your cat has been cleaned!"
-                m.ShowCleanMenu = false // Hide the clean menu after action
-            case "esc":
-                m.ShowCleanMenu = false // Hide the clean menu
-            }
-            return m, nil // Early return to avoid further processing
+            return m.handleCleanMenu(msg)
         }
 
-
-        // If the buy menu is open
         if m.ShowBuyMenu {
-            switch msg.String() {
-            case "left":
-                m.SelectedFoodIndex = (m.SelectedFoodIndex - 1 + len(m.FoodInventory)) % len(m.FoodInventory) // Adjust to number of items
-            case "right":
-                m.SelectedFoodIndex = (m.SelectedFoodIndex + 1) % len(m.FoodInventory)
-            case "up":
-                m.SelectedFoodIndex = (m.SelectedFoodIndex - 5 + len(m.FoodInventory)) % len(m.FoodInventory) // Move up a row
-            case "down":
-                m.SelectedFoodIndex = (m.SelectedFoodIndex + 5) % len(m.FoodInventory) // Move down a row
-            case "enter":
-                selectedFood := &m.FoodInventory[m.SelectedFoodIndex]
-                if m.MyCat.Coins >= selectedFood.Cost && selectedFood.Quantity < MAX_FOOD_INVENTORY_QUANTITY {
-                    m.MyCat.Coins -= selectedFood.Cost // Deduct coins
-                    selectedFood.Quantity++            // Increase quantity
-                    m.ActionMessage = fmt.Sprintf("Bought %s for %d coins", selectedFood.Name, selectedFood.Cost)
-                } else if selectedFood.Quantity >= MAX_FOOD_INVENTORY_QUANTITY {
-                    m.ActionMessage = "Already stocked up!"
-                } else {
-                    m.ActionMessage = "Not enough coins!"
-                }
-            case "esc":
-                m.ShowBuyMenu = false // Hide the buy food menu
-                m.ShowFoodMenu = true // Return to the food menu
-            }
-            return m, nil // Early return to avoid further processing
+            return m.handleBuyMenu(msg)
         }
 
-        // If the food menu is open
         if m.ShowFoodMenu {
-            switch msg.String() {
-            case "left":
-                m.FocusedFoodButton = (m.FocusedFoodButton - 1 + len(m.FoodButtonLabels)) % len(m.FoodButtonLabels)
-            case "right":
-                m.FocusedFoodButton = (m.FocusedFoodButton + 1) % len(m.FoodButtonLabels)
-            case "enter":
-                if m.FoodButtonLabels[m.FocusedFoodButton] == "Feed" {
-                    m.ShowFoodMenu = false  // Hide the food menu
-                    m.ShowInventoryMenu = true // Show inventory menu
-                    m.SelectedFoodIndex = 0 // Reset selected food index
-                } else {
-                    m.ActionMessage = "Opening buy food menu..."
-                    m.ShowFoodMenu = false
-                    m.ShowBuyMenu = true // Show buy menu
-                }
-            case "esc":
-                m.ShowFoodMenu = false // Hide the food menu
-                m.FocusedFoodButton = 0 // Reset focused food button
-            }
-            return m, nil // Early return to avoid further processing
+            return m.handleFoodMenu(msg)
         }
 
-        // If the inventory menu is open
         if m.ShowInventoryMenu {
-            switch msg.String() {
-            case "left":
-                m.SelectedFoodIndex = (m.SelectedFoodIndex - 1 + len(m.FoodInventory)) % len(m.FoodInventory) // Adjust to number of food items
-            case "right":
-                m.SelectedFoodIndex = (m.SelectedFoodIndex + 1) % len(m.FoodInventory)
-            case "up":
-                m.SelectedFoodIndex = (m.SelectedFoodIndex - 5 + len(m.FoodInventory)) % len(m.FoodInventory) // Move up a row
-            case "down":
-                m.SelectedFoodIndex = (m.SelectedFoodIndex + 5) % len(m.FoodInventory) // Move down a row
-            case "enter":
-                selectedFood := &m.FoodInventory[m.SelectedFoodIndex]
-                if selectedFood.Quantity > 0 && m.MyCat.Fullness < 100 {
-                    // Feed food to cat
-                    selectedFood.Quantity-- 
-
-                    m.ActionMessage = fmt.Sprintf("You fed the cat: %s", selectedFood.Name)
-
-                    m.MyCat.GainXP(XP_FEEDING, &m)
-                    m.MyCat.Fullness += float64(selectedFood.FeedingPower)
-                    m.MyCat.Hunger += HUNGER_SATIATED_FACTOR
-                    m.MyCat.Boredom += BOREDOM_FEEDING_FACTOR
-                    m.MyCat.Health += HEALTH_FEEDING_REGEN_FACTOR
-                    m.MyCat.Coins += COINS_FEEDING_FACTOR 
-                    m.MyCat.LastFed = time.Now()
-
-                    // Cap hunger and fullness at 100
-                } else if selectedFood.Quantity <= 0 {
-                    m.ActionMessage = "Out of stock!"
-                } else if m.MyCat.Fullness >= 100 {
-                    m.ActionMessage = "Termi is full, can't have any more!" 
-                }
-            case "esc":
-                m.ShowInventoryMenu = false // Hide the inventory menu
-                m.ShowFoodMenu = true // Return to the food menu
-            }
-            return m, nil // Early return to avoid further processing
+            return m.handleInventoryMenu(msg)
         }
 
         return m.handleKeyMsg(msg)
 
     case time.Time:
-        // Handle animation frame updates
         m.CurrentFrame = (m.CurrentFrame + 1) % len(m.Frames)
-        // Continue the animation loop
         return m, tea.Tick(time.Millisecond*500, func(t time.Time) tea.Msg {
-            return t})
-        }
-
-        return m, nil
+            return t
+        })
     }
 
-// decayCatFullness reduces the cat's fullness based on elapsed time.
-func (m *model) decayCatFullness() {
-    currentTime := time.Now()
-    elapsed := currentTime.Sub(m.MyCat.LastFed)
-    seconds := elapsed.Seconds()
-    m.MyCat.Fullness -= FULLNESS_DECAY_RATE_PER_SECOND * seconds
-    m.MyCat.LastFed = currentTime
+    return m, nil
 }
+
 
 // handleQuit handles the quit logic and saves the game data.
 func (m *model) handleQuit() (tea.Model, tea.Cmd) {
@@ -193,40 +84,6 @@ func (m *model) handleKeyMsg(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
     }
     return m, nil
 }
-
-// handleMenuAction performs actions based on the currently focused button.
-func (m *model) handleMenuAction() (tea.Model, tea.Cmd) {
-    switch m.FocusedButton {
-    case 0:
-        m.feedMenu()
-    case 1:
-        m.gameMenu()
-    case 2:
-        m.cleanMenu()
-    case 3:
-        m.sleepMenu()
-    }
-    return m, nil
-}
-
-func (m *model) feedMenu() {
-    print("feed_main clicked")
-    m.ShowFoodMenu = true // Show food menu
-    m.FocusedFoodButton = 0 // Reset food button focus when entering
-    m.FocusedButton = -1 // Reset focused button
-}
-func (m *model) gameMenu() {
-    print("game_main clicked")
-}
-func (m *model) cleanMenu() {
-    print("clean_main clicked")
-    m.ShowCleanMenu = true // show clean menu
-    m.FocusedButton = -1 // Reset focused button
-}
-func (m *model) sleepMenu() {
-    print("sleep_main clicked")
-}
-
 
 func (m model) View() string {
     // layout using Lipgloss
@@ -269,6 +126,7 @@ func (m model) View() string {
     }
 
     // Render inventory menu if it is visible
+    // refactor this because is boilerplate code
     var inventoryView string
     if m.ShowInventoryMenu {
         inventoryView += "Food Inventory:\n"
