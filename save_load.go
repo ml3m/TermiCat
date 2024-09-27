@@ -6,7 +6,7 @@ import (
 )
 
 // Save the game state to a file
-func SaveGameData(game model, filename string) error {
+func SaveGameData(game *model, filename string) error {
     data, err := json.MarshalIndent(game, "", "  ")
     if err != nil {
         return err
